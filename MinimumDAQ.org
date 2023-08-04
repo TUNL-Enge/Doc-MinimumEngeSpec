@@ -13,155 +13,155 @@
 #+creator: Emacs 28.2 (Org mode 9.6.7)
 #+cite_export:
 * Introduction
-	The following instructions are based on Ubuntu LTS 22.04 install
+  The following instructions are based on Ubuntu LTS 22.04 install
   performed on Aug. 3, 2023. I am using the "Minimal Installation"
 * Initial quality-of-life
-	Some things to make life easier in general.
-	- Set up resolution etc. to your liking
-	- A background image for the TUNL/Enge group is provided in the =extras= folder
+  Some things to make life easier in general.
+  - Set up resolution etc. to your liking
+  - A background image for the TUNL/Enge group is provided in the =extras= folder
 * Prerequisite packages
 ** General linux packages you need
-	 - Basic
-		 #+BEGIN_SRC sh
+   - Basic
+     #+BEGIN_SRC sh
        sudo apt install git openssh-server libssl-dev screen build-essential emacs
-		 #+END_SRC
-	 - Other important tools that have various levels of necessity
-		 #+BEGIN_SRC sh
-			 sudo apt install ess libblas-dev liblapack-dev gfortran cmake elpa-magit xorg-dev org-mode emacs-goodies-el python3-pip
-		 #+END_SRC
-	 - Some specific ubuntu packages for DAQ analysis
-		 #+BEGIN_SRC sh
-			 sudo apt install libboost-python-dev libboost-numpy-dev libxml2-dev python3-numpy
-		 #+END_SRC
-	 - Make a folder to install all MIDAS-related packages
-		 #+BEGIN_SRC sh
-			 cd
-			 mkdir -p midas/packages
-		 #+END_SRC
+     #+END_SRC
+   - Other important tools that have various levels of necessity
+     #+BEGIN_SRC sh
+       sudo apt install ess libblas-dev liblapack-dev gfortran cmake elpa-magit xorg-dev org-mode emacs-goodies-el python3-pip
+     #+END_SRC
+   - Some specific ubuntu packages for DAQ analysis
+     #+BEGIN_SRC sh
+       sudo apt install libboost-python-dev libboost-numpy-dev libxml2-dev python3-numpy
+     #+END_SRC
+   - Make a folder to install all MIDAS-related packages
+     #+BEGIN_SRC sh
+       cd
+       mkdir -p midas/packages
+     #+END_SRC
 
-	 - Reboot for good measure!
-		 #+BEGIN_SRC sh
-			 sudo shutdown -r now
-		 #+END_SRC
+   - Reboot for good measure!
+     #+BEGIN_SRC sh
+       sudo shutdown -r now
+     #+END_SRC
 * Specific DAQ Prerequisites/Tools
 ** ROOT
-	 I try to avoid it, but MIDAS shouts if ROOT isn't installed. You
-	 may find it useful, anyway. I prefer to just install from source
-	 - We'll install in =~/midas/packages/root=
-		 #+BEGIN_SRC sh
-			 cd ~/midas/packages
-			 git clone --branch latest-stable --depth=1 https://github.com/root-project/root.git root_src
-			 mkdir root_build root_install
-			 cd root_build
-		 #+END_SRC
-	 - Prepare the installation with the flags needed for MIDAS
-		 #+BEGIN_SRC sh
-			 cmake -DCMAKE_INSTALL_PREFIX=../root_install -Dminuit2=ON -Dxml=ON ../root_src
-		 #+END_SRC
-	 - Build and install all at once (using 4 cores of the processor)
-		 #+BEGIN_SRC sh
-			 cmake --build . -- install -j4
-		 #+END_SRC
-	 - [[https://xkcd.com/303/][Wait a long-ass time]]
-	 - Check whether it works
-		 #+BEGIN_SRC sh
-			 source ~/midas/packages/root/root_install/bin/thisroot.sh
-			 root
-		 #+END_SRC
-	 - Add the following at the end of your =~/.bashrc= file. This will
+   I try to avoid it, but MIDAS shouts if ROOT isn't installed. You
+   may find it useful, anyway. I prefer to just install from source
+   - We'll install in =~/midas/packages/root=
+     #+BEGIN_SRC sh
+       cd ~/midas/packages
+       git clone --branch latest-stable --depth=1 https://github.com/root-project/root.git root_src
+       mkdir root_build root_install
+       cd root_build
+     #+END_SRC
+   - Prepare the installation with the flags needed for MIDAS
+     #+BEGIN_SRC sh
+       cmake -DCMAKE_INSTALL_PREFIX=../root_install -Dminuit2=ON -Dxml=ON ../root_src
+     #+END_SRC
+   - Build and install all at once (using 4 cores of the processor)
+     #+BEGIN_SRC sh
+       cmake --build . -- install -j4
+     #+END_SRC
+   - [[https://xkcd.com/303/][Wait a long-ass time]]
+   - Check whether it works
+     #+BEGIN_SRC sh
+       source ~/midas/packages/root/root_install/bin/thisroot.sh
+       root
+     #+END_SRC
+   - Add the following at the end of your =~/.bashrc= file. This will
      make sure root works every time you boot/open a terminal:
-		 #+BEGIN_SRC sh
-			 ## Root
-			 source ${HOME}/midas/packages/root/root_install/bin/thisroot.sh
-		 #+END_SRC
-	 - Close the terminal, open a new one, and check
-		 #+BEGIN_SRC sh
-			 root
-		 #+END_SRC
+     #+BEGIN_SRC sh
+       ## Root
+       source ${HOME}/midas/packages/root/root_install/bin/thisroot.sh
+     #+END_SRC
+   - Close the terminal, open a new one, and check
+     #+BEGIN_SRC sh
+       root
+     #+END_SRC
 ** MIDAS
-	 The minimum MIDAS you need for /analysis/
-	 - Make sure the environment is ready for MIDAS by putting the
+   The minimum MIDAS you need for /analysis/
+   - Make sure the environment is ready for MIDAS by putting the
      following at the end of your =~/.bashrc= file
-		 #+BEGIN_SRC sh
-			 ## MIDAS
-			 export ROOTANASYS=${HOME}/midas/packages/rootana
-		 #+END_SRC
-	 - Close and reopen a terminal to make sure this takes effect
-	 - Install the MIDAS analysis package =Rootana=
-		 #+BEGIN_SRC sh
-			 cd ~/midas/packages
-			 git clone https://bitbucket.org/tmidas/rootana
-			 cd rootana
-		 #+END_SRC
-	 - Rootana needs ~-fPIC~ to work with EngeSpec
-		 - Edit ~Makefile~ to include ~-fPIC~ in the ~CXXFLAGS~ definition at the top
-			 #+BEGIN_SRC sh
-				 CXXFLAGS = -g -O2 -Wall -Wuninitialized -I./include -fPIC
-			 #+END_SRC
-	 - Compile
-		 #+BEGIN_SRC sh
-			 make NO_MIDAS=1
-		 #+END_SRC
-	 - If you get a compile error, try try again!
-		 #+BEGIN_SRC sh
-			 make NO_MIDAS=1
-		 #+END_SRC
+     #+BEGIN_SRC sh
+       ## MIDAS
+       export ROOTANASYS=${HOME}/midas/packages/rootana
+     #+END_SRC
+   - Close and reopen a terminal to make sure this takes effect
+   - Install the MIDAS analysis package =Rootana=
+     #+BEGIN_SRC sh
+       cd ~/midas/packages
+       git clone https://bitbucket.org/tmidas/rootana
+       cd rootana
+     #+END_SRC
+   - Rootana needs ~-fPIC~ to work with EngeSpec
+     - Edit ~Makefile~ to include ~-fPIC~ in the ~CXXFLAGS~ definition at the top
+       #+BEGIN_SRC sh
+         CXXFLAGS = -g -O2 -Wall -Wuninitialized -I./include -fPIC
+       #+END_SRC
+   - Compile
+     #+BEGIN_SRC sh
+       make NO_MIDAS=1
+     #+END_SRC
+   - If you get a compile error, try try again!
+     #+BEGIN_SRC sh
+       make NO_MIDAS=1
+     #+END_SRC
 * EngeSpec
-	This is the main software you need for doing data analysis
-	- Download the code
-		#+BEGIN_SRC sh
-			cd
-			git clone https://github.com/TUNL-Enge/DAQ-EngeSpec.git EngeSpec
-			cd EngeSpec/lib
-			cmake .
-			make
-		#+END_SRC
-	- You like likely see lots of =BOOST_HEADER_DEPRECIATED= errors.
+  This is the main software you need for doing data analysis
+  - Download the code
+    #+BEGIN_SRC sh
+      cd
+      git clone https://github.com/TUNL-Enge/DAQ-EngeSpec.git EngeSpec
+      cd EngeSpec/lib
+      cmake .
+      make
+    #+END_SRC
+  - You like likely see lots of =BOOST_HEADER_DEPRECIATED= errors.
     Ignore them!
-	- Install all the python you need for EngeSpec
-		#+BEGIN_SRC sh
-			pip install PyQt5 PySide6 matplotlib scipy lmfit pandas
-		#+END_SRC
-	- Add the weird python path to your =~/.bashrc= file
-		#+BEGIN_SRC sh
-			export PATH=$PATH:$HOME/.local/bin
-		#+END_SRC
-	- Add a link to your sort routine of choice
-		#+BEGIN_SRC sh
-			cd ~/EngeSpec
-			ln -s lib/libEngeSort.so EngeSort.so
-		#+END_SRC
-	- Load EngeSpec
-		#+BEGIN_SRC sh
-			./EngeSpec
-		#+END_SRC
-	- Make sure the sort routine loads. Go to =Connect MIDAS->Offline MIDAS=
-	- You should see a list of defined histograms on the left
-	- Now you can add a run file (=mid.lz4= files) and run it
+  - Install all the python you need for EngeSpec
+    #+BEGIN_SRC sh
+      pip install PyQt5 PySide6 matplotlib scipy lmfit pandas
+    #+END_SRC
+  - Add the weird python path to your =~/.bashrc= file
+    #+BEGIN_SRC sh
+      export PATH=$PATH:$HOME/.local/bin
+    #+END_SRC
+  - Add a link to your sort routine of choice
+    #+BEGIN_SRC sh
+      cd ~/EngeSpec
+      ln -s lib/libEngeSort.so EngeSort.so
+    #+END_SRC
+  - Load EngeSpec
+    #+BEGIN_SRC sh
+      ./EngeSpec
+    #+END_SRC
+  - Make sure the sort routine loads. Go to =Connect MIDAS->Offline MIDAS=
+  - You should see a list of defined histograms on the left
+  - Now you can add a run file (=mid.lz4= files) and run it
     (instructions on using EngeSpec are outside the scope of this
     document!).
 * FPPlot
-	This is if you want some kind of focal plane prediction. 
-	- Download the FPPlot code =https://github.com/TUNL-Enge/Analysis-FPPlot=
-	- Install prerequisites
-		#+BEGIN_SRC sh
-			sudo apt install libgtk2.0-dev libcanberra-gtk-module
-		#+END_SRC
+  This is if you want some kind of focal plane prediction. 
+  - Download the FPPlot code =https://github.com/TUNL-Enge/Analysis-FPPlot=
+  - Install prerequisites
+    #+BEGIN_SRC sh
+      sudo apt install libgtk2.0-dev libcanberra-gtk-module
+    #+END_SRC
 
-	- Download the needed R packages
-		- Download gWidgets from https://cran.r-project.org/src/contrib/Archive/gWidgets/
-		- Download RGtk2 from https://cran.r-project.org/src/contrib/Archive/RGtk2/
-		- Download cairoDevice from https://cran.r-project.org/src/contrib/Archive/cairoDevice/
-		- Download gWidgetsRGtk2 from https://cran.r-project.org/src/contrib/Archive/gWidgetsRGtk2/
-	- Install the above packages in the same order
-		#+BEGIN_SRC sh
-			R
-			install.packages("nameofzip.tar.gz")
-		#+END_SRC
-	- Now try running it
-		#+BEGIN_SRC sh
-			./FPPlot
-		#+END_SRC
-	- You may need to get input files from somewhere...
+  - Download the needed R packages
+    - Download gWidgets from https://cran.r-project.org/src/contrib/Archive/gWidgets/
+    - Download RGtk2 from https://cran.r-project.org/src/contrib/Archive/RGtk2/
+    - Download cairoDevice from https://cran.r-project.org/src/contrib/Archive/cairoDevice/
+    - Download gWidgetsRGtk2 from https://cran.r-project.org/src/contrib/Archive/gWidgetsRGtk2/
+  - Install the above packages in the same order
+    #+BEGIN_SRC sh
+      R
+      install.packages("nameofzip.tar.gz")
+    #+END_SRC
+  - Now try running it
+    #+BEGIN_SRC sh
+      ./FPPlot
+    #+END_SRC
+  - You may need to get input files from somewhere...
 
 
