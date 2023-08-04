@@ -21,7 +21,7 @@
 	- A background image for the TUNL/Enge group is provided in the =extras= folder
 * Prerequisite packages
 ** General linux packages you need
-	 - Basic
+*** Basic
 		 #+BEGIN_SRC sh
 			 sudo apt install git openssh-server libssl-dev screen build-essential emacs
 		 #+END_SRC
