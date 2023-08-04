@@ -4,7 +4,7 @@
 * Initial quality-of-life
 	Some things to make life easier in general.
 	- Set up resolution etc. to your liking
-	- A background image for the TUNL/Enge group is provided in the files folder
+	- A background image for the TUNL/Enge group is provided in the =extras= folder
 * Prerequisite packages
 ** General linux packages you need
 	 - Basic
@@ -29,12 +29,6 @@
 		 #+BEGIN_SRC sh
 			 sudo shutdown -r now
 		 #+END_SRC
-
-** R Packages
-	 Install a bunch of packages for R
-    #+BEGIN_SRC sh
-    sudo apt install 
-    #+END_SRC
 * Specific DAQ Prerequisites/Tools
 ** ROOT
 	 I try to avoid it, but MIDAS shouts if ROOT isn't installed. You
