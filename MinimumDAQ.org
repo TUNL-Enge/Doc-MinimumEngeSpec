@@ -23,7 +23,7 @@
 ** General linux packages you need
 	 - Basic
 		 #+BEGIN_SRC sh
-			 sudo apt install git openssh-server libssl-dev screen build-essential emacs
+       sudo apt install git openssh-server libssl-dev screen build-essential emacs
 		 #+END_SRC
 	 - Other important tools that have various levels of necessity
 		 #+BEGIN_SRC sh
